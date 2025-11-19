@@ -23,26 +23,32 @@ def main_request(baseurl, endpoint, api, busqueda):
         "apiKey": api,
         "query": busqueda,
     }
+    # Guardamos la respuesta
     response = requests.get(baseurl + endpoint, params=parametros)
+    # Convertimos la respuesta a json
     return response.json()
 
-class productosNodo:
-    print("")
+# Inicializamos los nodos para después hacer comparativas
+class ProductosNodo:
+    def __init__(self, id_producto, nombre):
+        self.id_producto = id_producto
+        self.nombre = nombre
+        self.vecinos = []
+    
+    # Sin esta función no es légible nuestra lista (con los productos)
+    # nos muestra las direcciones donde se almacenan en vez de los strings o int
+    def __repr__(self):
+        return f"<{self.nombre} (ID: {self.id_producto})"
 
-print(main_request(baseurl, endpoint, api_key, "coffe"))
-"""def parsce_json(response):
-    list_provisional = []
-    for item in response:
-        products = {
-            'id': item['id'],
-            'name': item['title'],
-            'ingredients' : item['ingredients'],
-        }
-        list_provisional.append(products)
-    return list_provisional
+# Creamos una lista y vamos añadiendo nuestros productos con id y nombre
+def parse_json(response):
+    nodos = []
+    for item in response['menuItems']:
+        nuevo_nodo = ProductosNodo(item['id'], item['title'])
+        nodos.append(nuevo_nodo)
+    return nodos
 
-data = main_request(baseurl, endpoint)
-print(data)
-#print(data[0]['title'])
-#print(parsce_json(data))
-"""
+# guardamos en "data" el texto formato json
+data = main_request(baseurl, endpoint, api_key, "coffe")
+# Imprimimos la lista
+print(parse_json(data))
